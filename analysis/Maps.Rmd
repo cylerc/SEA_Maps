@@ -94,7 +94,7 @@ terrain_close <- GetMap.bbox(lonR= range(lon), latR= range(lat), center= c(12.5,
 #Let's try making a plot using googlemaps with different code. Found here: https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/ggmap/ggmapCheatsheet.pdf
 map <- get_map(location = 'Thailand', zoom = 4)
 ggmap(map) +
-geom_point(aes(x = lon, y = lat), data = samps, alpha = .5, color="darkred", size = 3)
+geom_point(aes(x = lon, y = lat), data = samps, alpha = .5, color="darkred", size = 3) + xlab("Longitude") + ylab("Latitude") + labs(title="Sites in MSEA")
 ```
 
 ```{r session_info}
