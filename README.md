@@ -1,6 +1,6 @@
 # SEA_Maps
 
-Exploring mapping capabilities in R
+Exploring mapping capabilities in R.
 
 Authors of this repository: Cyler Norman Conrad (cylerc@unm.edu)
 
