@@ -91,13 +91,11 @@ terrain_close <- GetMap.bbox(lonR= range(lon), latR= range(lat), center= c(12.5,
 ```
 
 ```{r}
-#Let's try making a plot using googlemaps with different code. Found here: http://www.milanor.net/blog/?p=534
+#Let's try making a plot using googlemaps with different code. Found here: https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/ggmap/ggmapCheatsheet.pdf
 map <- get_map(location = 'Thailand', zoom = 4)
-ggmap(map)
-
-#Need to figure out how to add points to this layer...
+ggmap(map) +
+geom_point(aes(x = lon, y = lat), data = samps, alpha = .5, color="darkred", size = 3)
 ```
-
 
 ```{r session_info}
 # Computational environment and software dependencies for this analysis.
