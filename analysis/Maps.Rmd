@@ -84,13 +84,13 @@ names(mymarkers) <- c("lat", "lon", "size", "col", "char")  #assign column headi
 lat <- c(0,25) 
 lon <- c(92,110) 
 
-#There is a problem in the code with this next command that I cannot figure out...
+#Error: There is a problem in the code with this next command that I cannot figure out.
 
 terrain_close <- GetMap.bbox(lonR= range(lon), latR= range(lat), center= c(12.5, 101), destfile= "analysis/figures/MSEA_TerrainPoints.png", markers=mymarkers, zoom=12, maptype="terrain") 
-#you can usegoogle maps: maptype = c("roadmap", "mobile", "satellite", "terrain", "hybrid", "mapmaker-roadmap", "mapmaker-hybrid")
+#you can also usegoogle maps: maptype = c("roadmap", "mobile", "satellite", "terrain", "hybrid", "mapmaker-roadmap", "mapmaker-hybrid")
 ```
 
-```{r}
+```{r maps using google and ggmap}
 #Let's try making a plot using googlemaps with different code. Found here: https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/ggmap/ggmapCheatsheet.pdf
 map <- get_map(location = 'Thailand', zoom = 4)
 ggmap(map) +
