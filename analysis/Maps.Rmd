@@ -1,0 +1,129 @@
+##Exploratory analysis of R mapping capabilities for sites in mainland Southeast Asia. 
+
+Cyler Conrad, Department of Anthropology, University of New Mexico, cylerc@unm.edu
+
+#Note: Code is emulated from Kim Gilbert's discussion here - http://www.molecularecologist.com/2012/09/making-maps-with-r/
+
+Details of the computational environment and software dependencies are listed at the end of this document. 
+
+```{r setup}
+# set the base directory for knitr to the directory above this one
+# install.packages(c("maps", "mapdata", "maptools", "scales", "RgoogleMaps"))
+library(knitr)
+opts_knit$set(root.dir = '../', progress = FALSE)
+```
+
+```{r load_libraries, message = FALSE, warning = FALSE}
+# see the output of sessionInfo() at the bottom for package version numbers
+library(ggmap)
+library(mapproj)
+library(maps)
+library(mapdata)
+library(maptools)
+library(RgoogleMaps)
+library(scales)
+```
+
+Note: The coordinates used in the following .csv datafile were extracted from the published literature, or based on my 'best-guess' through using published maps and googlemaps online. Some published coordinates only provide ˚ and ', not ˚ ' ''. The differing levels of position data are driving some problems in the maps, as seen below. Several site coordinates appear to need manual editing to fix. For R all sites need to have coordinates in the decimal system. These must be converted from degrees, minutes and seconds data. 
+
+```{r upload site decimal coordinate locations}
+samps <- read.csv("data/msea.csv")  
+samps
+```
+
+Note: This collection of sites all prehistoric cave, rockshelter and shellmound sites examined in Conrad (2015-Open Quaternary) with the addition of Non Nok Tha, Badah-lin, Laang Spean and Hang Boi. Several more late Holocene sites (Ban Non Wat, Ban Chiang,, etc.) will be added soon. 
+
+```{r plot in large defined lat/long space}
+#This plot uses an arbitrary space (see xlim and ylim) and plots the samps coordinates onto that defined layer. 
+#Note: x-axis is longitude and y-axis is latitude when defining coordinates. 
+par(mfrow=c(1,1)) #create single plot
+tiff("analysis/figures/MSEA.tif", res=600, compression = "lzw", width = 4, height = 4, units="in") #save as high resolution tif
+map("worldHires", xlim=c(92,110), ylim=c(0,25), col="gray90", fill=TRUE) #plot world map with defined coordinates of Southeast Asia
+points(samps$lon, samps$lat, pch=19, col="red", cex=0.5) 
+dev.off()
+#See map in R
+map("worldHires", xlim=c(92,110), ylim=c(0,25), col="gray90", fill=TRUE)
+points(samps$lon, samps$lat, pch=19, col="red", cex=0.5) 
+```
+
+Note: There should only be one site in Myanmar. The second site plotting near Thailand I believe is Banyan Valley Cave. This is plotted incorrectly based on the coordinates provided in Reynolds (1992-Asian Perspectives). This point will need to be 'best-guessed' near Steep Cliff Cave and Spirit Cave based off of Kiernan et al. 1988's map.  
+
+```{r plot using automated maps}
+#This plot uses the automated country maps to create a blank map of Southeast Asia, sites are added onto this layer. Note that some sites (Vietnam) are cut off of map because of the defined space in the automated maps. 
+map("worldHires","Thailand", col="gray90", fill=TRUE) 
+map("worldHires","Myanmar", col="gray95", fill=TRUE, add=TRUE)
+map("worldHires","Laos", col="gray95", fill=TRUE, add=TRUE)
+map("worldHires","Cambodia", col="gray95", fill=TRUE, add=TRUE)
+map("worldHires","Vietnam", col="gray95", fill=TRUE, add=TRUE)
+map("worldHires","Malaysia", col="gray95", fill=TRUE, add=TRUE)
+points(samps$lon, samps$lat, pch=19, col="red", cex=0.5)  
+```
+
+```{r plot in close up defined lat/long space}
+#This map creates a zoomed in map of northwest Thailand based on arbitrary coordinates.
+map("worldHires",xlim=c(97,103), ylim=c(16,20), col="gray90", fill=TRUE)
+points(samps$lon, samps$lat, pch=19, col="red", cex=0.5)  
+```
+
+Note: This map shows the problems with using differing levels of published coordinate data for sites. In Northwest Thailand we should have Spirit Cave, Banyan Valley Cave, Steep Cliff Cave, Tham Lod, Ban Rai and Non Nok Tha (on the previous plot). Clearly, based on the previous plot, some sites are missing and plotted inaccurately. It appears that SC, BVC, SCC and NNT are all correct, but Tham Lod and Ban Rai are plotted incorrectly and one is missing. It is possible that the previous plot that placed a site in Myanmar is actually Tham Lod or Ban Rai - either way, these sites should be to the south (slightly southwest) of Gorman's sites. 
+
+```{r plot using googlemaps}
+#This map uses terrain (or other) base google maps and plots the points as a separate layer. 
+lat <- c(0,25) #define space
+lon <- c(92,110) 
+center = c(mean(lat), mean(lon))
+center #tell what point to center on
+zoom <- 5  #zoom: 1 = furthest out (entire globe), larger numbers = closer in
+terrmap <- GetMap(center=center, zoom=zoom, maptype= "terrain", destfile = "analysis/figures/MSEA_Terrain.png") 
+samps$size <- "small"  #create a column indicating size of marker
+samps$col <- "red"   #create a column indicating color of marker
+samps$char <- ""   #normal Google Maps pinpoints will be drawn
+mymarkers <- cbind.data.frame(samps$lat, samps$lon, samps$size, samps$col, samps$char)   
+#create the data frame by binding my data columns of GPS coordinates with the newly created columns
+names(mymarkers) <- c("lat", "lon", "size", "col", "char")  #assign column headings
+lat <- c(0,25) 
+lon <- c(92,110) 
+
+#There is a problem in the code with this next command that I cannot figure out...
+
+terrain_close <- GetMap.bbox(lonR= range(lon), latR= range(lat), center= c(12.5, 101), destfile= "analysis/figures/MSEA_TerrainPoints.png", markers=mymarkers, zoom=12, maptype="terrain") 
+#you can usegoogle maps: maptype = c("roadmap", "mobile", "satellite", "terrain", "hybrid", "mapmaker-roadmap", "mapmaker-hybrid")
+```
+
+```{r}
+#Let's try making a plot using googlemaps with different code. Found here: http://www.milanor.net/blog/?p=534
+map <- get_map(location = 'Thailand', zoom = 4)
+ggmap(map)
+
+#Need to figure out how to add points to this layer...
+```
+
+
+```{r session_info}
+# Computational environment and software dependencies for this analysis.
+sessionInfo()
+```
+
+LICENSE
+ 
+The MIT License (MIT)
+
+Copyright (c) 2015 Cyler Conrad 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
